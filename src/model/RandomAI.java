@@ -20,6 +20,6 @@ public class RandomAI implements TicTacToeStrategy {
   public Point desiredMove(TicTacToeGame theGame) {
  
  
-    return null;
+    return new Point(2,2);
   }
 }
