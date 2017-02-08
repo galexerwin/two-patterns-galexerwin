@@ -31,38 +31,32 @@ public class StopperAI implements TicTacToeStrategy {
 		  List<oddsOfWinning> odds = new ArrayList<>();
 		  // set the middle
 		  middleSquare = gameSize / 2;
-		  // always go after the center if the board is an odd numbered size and the space isn't taken
-		  if (gameHasCenter(gameSize) && theGame.available((middleSquare), (middleSquare)))
-			  return new Point((middleSquare), (middleSquare));
 		  // iterate over the entire game board
 		  for (int i = 0; i < theGame.size(); i++) {
 			  for (int j = 0; j < theGame.size(); j++) {
-				  // if this token belongs to the other player
-				  if (board[i][j] == player) {
-					  // new odds of winning objects
-					  column     = new oddsOfWinning();
-					  row	     = new oddsOfWinning();
-					  ulDiagonal = new oddsOfWinning();
-					  llDiagonal = new oddsOfWinning();
-					  // check the column
-					  if (checkCol(board, player, gameSize, j, column))
-						  odds.add(column);
-					  // check the row
-					  if (checkRow(board, player, gameSize, i, row))
-						  odds.add(row);
-					  // check the upper left diagonal
-					  if (checkULDiagonal(board, player, gameSize, i, j, ulDiagonal))
-						  odds.add(ulDiagonal);
-					  // check the lower left diagonal
-					  if (checkLLDiagonal(board, player, gameSize, i, j, llDiagonal))
-						  odds.add(llDiagonal);
-				  }
+				  // new odds of winning objects
+				  column     = new oddsOfWinning();
+				  row	     = new oddsOfWinning();
+				  ulDiagonal = new oddsOfWinning();
+				  llDiagonal = new oddsOfWinning();
+				  // check the column
+				  if (checkCol(board, player, gameSize, j, column))
+					  odds.add(column);
+				  // check the row
+				  if (checkRow(board, player, gameSize, i, row))
+					  odds.add(row);
+				  // check the upper left diagonal
+				  if (checkULDiagonal(board, player, gameSize, i, j, ulDiagonal))
+					  odds.add(ulDiagonal);
+				  // check the lower left diagonal
+				  if (checkLLDiagonal(board, player, gameSize, i, j, llDiagonal))
+					  odds.add(llDiagonal);
 			  }
 		  }
 		  // check if there were any odds
 		  if (odds.size() > 0) {
 			  // sort the list of odds
-			  Collections.sort(odds, new sortByOdds());
+			  Collections.sort(odds, new sortByOdds());		  
 			  // get the next move and the odds
 			  suggestedMove = odds.get(odds.size() - 1).getNextMove();
 			  bestWinOdds   = odds.get(odds.size() - 1).getChances();			  
@@ -93,14 +87,10 @@ public class StopperAI implements TicTacToeStrategy {
 		  // if there are no more moves
 		  throw new IGotNowhereToGoException("No more moves left!");		  
 	  }
-	  // determine if the game has a center space
-	  private boolean gameHasCenter(int size) {
-		  return ((size % 2) == 1);
-	  }
 	  // check if the player can win the upper left to lower right diagonal. false means zero chance because they are blocked
 	  private boolean checkULDiagonal(char[][] board, char player, int size, int px, int py, oddsOfWinning odds) {
 		  // variables
-		  int  sum = 0, x = -1, y = -1;
+		  int  playerX = 0, playerO = 0, x = -1, y = -1;
 		  boolean inRange = false;
 		  // sanity check if this is in the range
 		  for (int i = 0; i < size; i++) {
@@ -117,20 +107,32 @@ public class StopperAI implements TicTacToeStrategy {
 		  for (int i = 0; i < size; i++) {
 			  if (board[i][i] == player) {
 				  // increment the number of moves the player has on this diagonal
-				  sum++;
+				  playerX++;
+			  } else if (!(board[i][i] == player) && !(board[i][i] == '_')) {
+				  // increment our moves
+				  playerO++;
 			  } else if (board[i][i] == '_') {
 				  // a space was encountered, save it
 				  if (x == -1 && y == -1) { // find the closest space to the last move
 					  x = i;
 					  y = i;				  
 				  }
-			  } else {
+			  } else if (playerX >= 1 && playerO >= 1) {
 				  // our token was located in the path. player can't win
 				  return false;
 			  } 
 		  } 
-		  // set the odds of winning this round from this diagonal
-		  odds.setChances((double)sum/(double)size);
+		  // if we didn't find a space return false
+		  if (x == -1 && y == -1)
+			  return false;
+		  // check if the player O can win or block
+		  if (playerO > (size - 1)) {
+			  // set the chances to 100 to use that
+			  odds.setChances(1);
+		  } else {
+			  // set the odds of blocking this round from this diagonal
+			  odds.setChances((double)playerX/(double)size);			  
+		  }
 		  // set the recommended move
 		  odds.setNextMove(x, y);
 		  // return default
@@ -139,7 +141,7 @@ public class StopperAI implements TicTacToeStrategy {
 	  // check if the player can win the lower left to upper right diagonal. false means zero chance because they are blocked
 	  private boolean checkLLDiagonal(char[][] board, char player, int size, int px, int py, oddsOfWinning odds) {
 		  // variables
-		  int  sum = 0, x = -1, y = -1;
+		  int  playerX = 0, playerO = 0, x = -1, y = -1;
 		  boolean inRange = false;
 		  // sanity check if this is in the range
 		  for (int i = (size - 1), j = 0; i >= 0 && j < size; i--, j++) {
@@ -156,20 +158,32 @@ public class StopperAI implements TicTacToeStrategy {
 		  for (int i = (size - 1), j = 0; i >= 0 && j < size; i--, j++) {
 			  if (board[i][j] == player) {
 				  // increment the number of moves the player has on this diagonal
-				  sum++;
+				  playerX++;
+			  } else if (!(board[i][j] == player) && !(board[i][j] == '_')) {
+				  // increment our moves
+				  playerO++;
 			  } else if (board[i][j] == '_') {
 				  // a space was encountered, save it
 				  if (x == -1 && y == -1) { // find the closest space to the last move
 					  x = i;
 					  y = j;				  
 				  }
-			  } else {
-				  // our token was located in the path. player can't win
+			  } else if (playerX >= 1 && playerO >= 1) {
+				  // our token and there token were both located in the path. player can't win
 				  return false;
 			  } 
+		  } 
+		  // if we didn't find a space return false
+		  if (x == -1 && y == -1)
+			  return false;
+		  // check if the player O can win or block
+		  if (playerO > (size - 1)) {
+			  // set the chances to 100 to use that
+			  odds.setChances(1);
+		  } else {
+			  // set the odds of blocking this round from this diagonal
+			  odds.setChances((double)playerX/(double)size);			  
 		  }
-		  // set the odds of winning this round from this diagonal
-		  odds.setChances((double)sum/(double)size);
 		  // set the recommended move
 		  odds.setNextMove(x, y);
 		  // return default
@@ -178,25 +192,36 @@ public class StopperAI implements TicTacToeStrategy {
 	  // check if the player can win the row. false means zero chance because they are blocked
 	  private boolean checkRow(char[][] board, char player, int size, int row, oddsOfWinning odds) {
 		  // variables
-		  int  sum = 0, x = -1, y = -1;
+		  int  playerX = 0, playerO = 0, x = -1, y = -1;
 		  // iterate over the column
 		  for (int i = 0; i < size; i++) {
 			  if (board[row][i] == player) {
-				  // increment the number of moves the player has on this column
-			  sum++;			  
-		  } else if (board[row][i] == '_') {
-			  // a space was encountered, save it
-			  if (x == -1 && y == -1) { // find the closest space to the last move
-				  x = row;
-				  y = i;				  
-			  }
-		  } else {
-			  // our token was located in the path. player can't win this column
+				  // increment the number of moves the player has on this row
+				  playerX++;
+			  } else if (!(board[row][i] == player) && !(board[row][i] == '_')) {
+				  playerO++;				  
+			  } else if (board[row][i] == '_') {
+				  // a space was encountered, save it
+				  if (x == -1 && y == -1) { // find the closest space to the last move
+					  x = row;
+					  y = i;				  
+				  }
+			  } else if (playerX >= 1 && playerO >= 1) {
+				  // our token was located in the path. player can't win this column
 				  return false;
 			  } 
+		  } 
+		  // if we didn't find a space return false
+		  if (x == -1 && y == -1)
+			  return false;
+		  // check if the player O can win or block
+		  if (playerO == (size - 1)) {
+			  // set the chances to 100 to use that
+			  odds.setChances(1);
+		  } else {
+			  // set the odds of blocking this round from this row
+			  odds.setChances((double)playerX/(double)size);			  
 		  }
-		  // set the odds of winning this round from this column
-		  odds.setChances((double)sum/(double)size);
 		  // set the recommended move
 		  odds.setNextMove(x, y);
 		  // return default
@@ -205,25 +230,36 @@ public class StopperAI implements TicTacToeStrategy {
 	  // check if the player can win the column. false means zero chance because they are blocked
 	  private boolean checkCol(char[][] board, char player, int size, int col, oddsOfWinning odds) {
 		  // variables
-		  int  sum = 0, x = -1, y = -1;
+		  int  playerX = 0, playerO = 0, x = -1, y = -1;
 		  // iterate over the column
 		  for (int i = 0; i < size; i++) {
 			  if (board[i][col] == player) {
 				  // increment the number of moves the player has on this column
-			  sum++;			  
-		  } else if (board[i][col] == '_') {
-			  // a space was encountered, save it
-			  if (x == -1 && y == -1) { // find the closest space to the last move
-				  x = i;
-				  y = col;				  
-			  }
-		  } else {
-			  // our token was located in the path. player can't win this column
+				  playerX++;
+			  } else if (!(board[i][col] == player) && !(board[i][col] == '_')) {
+				  playerO++;				  
+			  } else if (board[i][col] == '_') {
+				  // a space was encountered, save it
+				  if (x == -1 && y == -1) { // find the closest space to the last move
+					  x = i;
+					  y = col;				  
+				  }
+			  } else if (playerX >= 1 && playerO >= 1) {
+				  // our token was located in the path. player can't win this column
 				  return false;
 			  } 
+		  } 
+		  // if we didn't find a space return false
+		  if (x == -1 && y == -1)
+			  return false;
+		  // check if the player O can win or block
+		  if (playerO > (size - 1)) {
+			  // set the chances to 100 to use that
+			  odds.setChances(1);
+		  } else {
+			  // set the odds of blocking this round from this column
+			  odds.setChances((double)playerX/(double)size);			  
 		  }
-		  // set the odds of winning this round from this column
-		  odds.setChances((double)sum/(double)size);
 		  // set the recommended move
 		  odds.setNextMove(x, y);
 		  // return default
