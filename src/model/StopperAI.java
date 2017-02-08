@@ -6,20 +6,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-/**
- * This TTT strategy tries to prevent the opponent from winning by checking
- * for a space where the opponent is about to win. If none found, it randomly
- * picks a place to win, which an sometimes be a win even if not really trying.
- * 
- * @author mercer
- */
 /*
  * Author: Alex Erwin
- * Purpose: Strategy to prevent the other player from winning by blocking their moves or randomly selecting a space to move to.
- * 
+ * Purpose: Strategy to prevent the other player from winning by blocking their moves or randomly selecting a space to move to. Includes
+ * an odds of winning class and comparable list of odds to determine the best odds of blocking the next move. This class isn't concerned
+ * with winning, only ties.
+ * Throws: IGotNowhereToGoException if there are no more moves left
  */
 public class StopperAI implements TicTacToeStrategy {
-	  // class vars
+	  // instance vars
 	  private int middleSquare;
 	  @Override
 	  public Point desiredMove(TicTacToeGame theGame) {

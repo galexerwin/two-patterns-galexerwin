@@ -1,15 +1,11 @@
 package model;
-
+// import classes
 import java.awt.Point;
-
-/**
- * This strategy selects the first available move at random.  It is easy to beat
- * 
- * @throws IGotNowhereToGoException whenever asked for a move that is impossible to deliver
- * 
- * @author mercer
+/*
+ * Author: Alex Erwin
+ * Purpose: Select a move at random. Uses a random generator but also uses next available space as a backup
+ * Throws: IGotNowhereToGoException if there are no more moves left
  */
-
 // There is an intentional compile time error.  Implement this interface
 public class RandomAI implements TicTacToeStrategy {
 
