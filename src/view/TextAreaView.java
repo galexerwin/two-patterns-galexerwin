@@ -51,8 +51,16 @@ public class TextAreaView  extends JPanel implements OurObserver {
 		  	}
 		  	// check if the game is still running
 		    if (!theGame.stillRunning()) {
-		    	// don't allow interaction
-		    	stateButton.setEnabled(false);
+		    	// update the board
+		    	updateBoard();
+		    	// set the appropriate message
+		    	if (theGame.didWin('O')) {
+		    		setLabelAndButtonState("O Wins", false);
+		    	} else if (theGame.didWin('X')) {
+		    		setLabelAndButtonState("X Wins", false);
+		    	} else {
+		    		setLabelAndButtonState("Tied", false);
+		    	}
 	  		} else {
 		    	 // update the board
 		    	updateBoard();

@@ -22,8 +22,8 @@ public class StopperAI implements TicTacToeStrategy {
 		  char player	 = theGame.getCurrentPlayerChar();
 		  char[][] board = theGame.getTicTacToeBoard();
 		  int gameSize	 = theGame.size();
-		  Point suggestedMove;
-		  double bestWinOdds;
+		  Point suggestedMove = new Point(-1,-1);
+		  double bestWinOdds = 0;
 		  int x = 0, y = 0, max = 0;
 		  // odds of winning objects for the available win types
 		  oddsOfWinning column, row, ulDiagonal, llDiagonal;
@@ -55,15 +55,18 @@ public class StopperAI implements TicTacToeStrategy {
 						  odds.add(ulDiagonal);
 					  // check the lower left diagonal
 					  if (checkLLDiagonal(board, player, gameSize, i, j, llDiagonal))
-						  odds.add(llDiagonal);					  
+						  odds.add(llDiagonal);
 				  }
 			  }
 		  }
-		  // sort the list of odds
-		  Collections.sort(odds, new sortByOdds());
-		  // get the best chance to block and the next move
-		  suggestedMove = odds.get(odds.size() - 1).getNextMove();
-		  bestWinOdds   = odds.get(odds.size() - 1).getChances();
+		  // check if there were any odds
+		  if (odds.size() > 0) {
+			  // sort the list of odds
+			  Collections.sort(odds, new sortByOdds());
+			  // get the next move and the odds
+			  suggestedMove = odds.get(odds.size() - 1).getNextMove();
+			  bestWinOdds   = odds.get(odds.size() - 1).getChances();			  
+		  }
 		  // check if we want to use the suggested move or a random point
 		  if (bestWinOdds > 50) {
 			  return suggestedMove;

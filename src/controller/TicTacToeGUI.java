@@ -33,6 +33,11 @@ import view.TextAreaView;
  * 
  * @author mercer
  */
+/*
+ * Author: Alex Erwin
+ * Purpose: Changed to add the ability to select the buttonView or the TextAreaView from the menu
+ * 
+ */
 public class TicTacToeGUI extends JFrame {
 
   public static void main(String[] args) {
@@ -62,20 +67,12 @@ public class TicTacToeGUI extends JFrame {
     
     addObservers();
     // Set default view
-    //setViewTo(buttonView);
-    setViewTo(textAreaView);
+    setViewTo(buttonView);
   }
-
-  private void getButtonView() {
-	  
-  }
-  
-  private void getTextAreaView() {
-	  
-  }
-  
+  // changed to add a second observer
   private void addObservers() {
-    //theGame.addObserver(buttonView);
+	 // add both the default and 2nd observers
+     theGame.addObserver(buttonView);
 	 theGame.addObserver(textAreaView);  
   }
 
@@ -97,7 +94,13 @@ public class TicTacToeGUI extends JFrame {
     jmi2Nest.add(beginner);
     JMenuItem intermediate = new JMenuItem("Stopper");
     jmi2Nest.add(intermediate);
-
+    // add the view menu child and the JButton/JTextField sub items
+    JMenuItem view = new JMenu("View");
+    menu.add(view);
+    JMenuItem viewButton = new JMenuItem("JButton");
+    view.add(viewButton);
+    JMenuItem viewTextArea = new JMenuItem("JTextField");
+    view.add(viewTextArea);
     // Set the menu bar
     JMenuBar menuBar = new JMenuBar();
     setJMenuBar(menuBar);
@@ -108,6 +111,8 @@ public class TicTacToeGUI extends JFrame {
     newGame.addActionListener(menuListener);
     beginner.addActionListener(menuListener);
     intermediate.addActionListener(menuListener);
+    viewButton.addActionListener(menuListener);
+    viewTextArea.addActionListener(menuListener);
   }
 
   private void setViewTo(JPanel newView) {
@@ -125,9 +130,14 @@ public class TicTacToeGUI extends JFrame {
     public void actionPerformed(ActionEvent e) {
       // Find out the text of the JMenuItem that was just clicked
       String text = ((JMenuItem) e.getSource()).getText();
-
-      if (text.equals("Button"))
+      // set the view to the original view
+      if (text.equals("JButton")) {
         setViewTo(buttonView);
+      }
+      // set the view to the JTextArea view
+      if (text.equals("JTextField")) {
+    	setViewTo(textAreaView);
+      }
 
       if (text.equals("New Game")) {
         theGame.startNewGame(); // The computer player has been set and should not change.
